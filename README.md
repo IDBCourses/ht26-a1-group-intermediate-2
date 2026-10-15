@@ -1,6 +1,6 @@
 # Our instrument
 
-**Play it here:** <!-- Paste your GitHub Pages link here, e.g. https://idbcourses.github.io/ht26-a1-group-01/ -->
+**Play it here:** <-- https://github.com/IDBCourses/ht26-a1-group-intermediate-2 -->
 
 **Group:** Bence, Fabian, Ishkanda, Katarina
 
