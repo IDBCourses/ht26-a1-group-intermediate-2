@@ -78,7 +78,7 @@ function keyDown(event) {
     //^END OF BASS NOTES
 
     //RIGHT SIDE 3*3 GRID KEYBOARD --> HIGH NOTES
-    if (event.key === "7+") synth.triggerAttackRelease(highnotes[0], "8n", now);
+    if (event.key === "7") synth.triggerAttackRelease(highnotes[0], "8n", now);
     else if (event.key === "8")
       synth.triggerAttackRelease(highnotes[1], "8n", now);
     else if (event.key === "9")
