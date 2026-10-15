@@ -28,28 +28,61 @@ let bassnotes = ["B3", "C4", "D4", "E5", "F4", "G4", "A4", "B4", "C5"];
 //List of notes for the right side grid of keyboard --> higher octave for higher notes
 let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
 
+// Key to start the loop;
+let noteKey = " ";
+
 // melody for the loop
 let melody = [
   "C4",
   "D4",
   "A4",
+
   "C4",
   "D4",
   "A4",
+
   "C4",
   "D4",
   "A4",
+
   "C4",
   "D4",
   "A4",
+
+  "G4",
+  //"C4",
+  "C5",
+  //"G5",
+  "G4",
+
+  "E4",
+  "C4",
+  "A3",
+
+  //"D5",
+  "D4",
+  //"B4",
+  "B3",
+  //"G4",
+  "G3",
+
+  "C4",
+  "B4",
+  "C5",
 ];
 let chords = [
   ["A3", "C4", "E4"],
   ["F3", "A3", "C4"],
   ["C3", "E3", "G3"],
   ["G3", "B3", "D4"],
+
+  ["C3", "E3", "G3"],
+  ["A3", "C4", "E4"],
+  ["G3", "B3", "D4"],
+  ["C3", "E3", "G3"],
 ];
-let noteKey = " "; // Key to start the loop;
+
+let spacePress = false; // Condition to check if space is pressed;
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
@@ -59,6 +92,8 @@ let noteKey = " "; // Key to start the loop;
 // Make the instruments and plug them into the speakers.
 const synth = new Tone.PolySynth(Tone.Synth).toDestination(); // can play several notes at once
 const chordsynth = new Tone.PolySynth(Tone.Synth).toDestination();
+synth.volume.value = -5; // adjust synth volume
+chordsynth.volume.value = -10; // adjust chord volume
 
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
@@ -74,63 +109,90 @@ function use() {
   setTimeout(use, 100); // call use() again in 100 milliseconds
 }
 
+//LOOP for melody and chord by user - as7432 -
+function melodyAndChords() {
+  const now = Tone.now();
+
+  // checks if space is pressed, the code below wont run if it space isn't pressed
+  if (spacePress) {
+    return;
+  }
+  spacePress = true;
+
+  for (let i = 0; i < melody.length; i++) {
+    synth.triggerAttackRelease(melody[i], "16n", now + i * 0.5); // plays the melody, default is "8n" 0.5
+  }
+  for (let i = 0; i < chords.length; i++) {
+    chordsynth.triggerAttackRelease(chords[i], 1, now + i * 1.5); // plays the chord, default is 1.2 ,1.5
+  }
+  // timeout space so that it cannot be pressed to avoid overlapping audio.
+  setTimeout(function () {
+    spacePress = false;
+  }, 12500);
+}
+
+function bassAndHigh(event) {
+  const now = Tone.now();
+  //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
+  if (event.key === "1") synth.triggerAttackRelease(bassnotes[0], "8n", now);
+  else if (event.key === "2")
+    synth.triggerAttackRelease(bassnotes[1], "8n", now);
+  else if (event.key === "3")
+    synth.triggerAttackRelease(bassnotes[2], "8n", now);
+  else if (event.key === "q")
+    synth.triggerAttackRelease(bassnotes[3], "8n", now);
+  else if (event.key === "w")
+    synth.triggerAttackRelease(bassnotes[4], "8n", now);
+  else if (event.key === "e")
+    synth.triggerAttackRelease(bassnotes[5], "8n", now);
+  else if (event.key === "a")
+    synth.triggerAttackRelease(bassnotes[6], "8n", now);
+  else if (event.key === "s")
+    synth.triggerAttackRelease(bassnotes[7], "8n", now);
+  else if (event.key === "d")
+    synth.triggerAttackRelease(bassnotes[8], "8n", now);
+  //^END OF BASS NOTES
+
+  //RIGHT SIDE 3*3 GRID KEYBOARD --> HIGH NOTES
+  if (event.key === "7") synth.triggerAttackRelease(highnotes[0], "8n", now);
+  else if (event.key === "8")
+    synth.triggerAttackRelease(highnotes[1], "8n", now);
+  else if (event.key === "9")
+    synth.triggerAttackRelease(highnotes[2], "8n", now);
+  else if (event.key === "u")
+    synth.triggerAttackRelease(highnotes[3], "8n", now);
+  else if (event.key === "i")
+    synth.triggerAttackRelease(highnotes[4], "8n", now);
+  else if (event.key === "o")
+    synth.triggerAttackRelease(highnotes[5], "8n", now);
+  else if (event.key === "j")
+    synth.triggerAttackRelease(highnotes[6], "8n", now);
+  else if (event.key === "k")
+    synth.triggerAttackRelease(highnotes[7], "8n", now);
+  else if (event.key === "l")
+    synth.triggerAttackRelease(highnotes[8], "8n", now);
+  //^END OF HIGH NOTES
+}
+
 // ---------- Controls (Event Handlers) ----------
 // Runs every time a key goes down.
-function keyDown(event) {
-  Tone.start(); // browsers only allow sound after the player has pressed something
-  const now = Tone.now();
+async function keyDown(event) {
+  await Tone.start(); // browsers only allow sound after the player has pressed something
+
+  //const now = Tone.now();
+
   // Holding a key down sends keydown again and again. Only react to the first one.
-  if (event.repeat === false) {
-    //console.log("Key down:", event.key);
-    //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
-    if (event.key === "1") synth.triggerAttackRelease(bassnotes[0], "8n", now);
-    else if (event.key === "2")
-      synth.triggerAttackRelease(bassnotes[1], "8n", now);
-    else if (event.key === "3")
-      synth.triggerAttackRelease(bassnotes[2], "8n", now);
-    else if (event.key === "q")
-      synth.triggerAttackRelease(bassnotes[3], "8n", now);
-    else if (event.key === "w")
-      synth.triggerAttackRelease(bassnotes[4], "8n", now);
-    else if (event.key === "e")
-      synth.triggerAttackRelease(bassnotes[5], "8n", now);
-    else if (event.key === "a")
-      synth.triggerAttackRelease(bassnotes[6], "8n", now);
-    else if (event.key === "s")
-      synth.triggerAttackRelease(bassnotes[7], "8n", now);
-    else if (event.key === "d")
-      synth.triggerAttackRelease(bassnotes[8], "8n", now);
-    //^END OF BASS NOTES
+  //if (event.repeat === false) {
+  //console.log("Key down:", event.key);
+  //}
 
-    //RIGHT SIDE 3*3 GRID KEYBOARD --> HIGH NOTES
-    if (event.key === "7") synth.triggerAttackRelease(highnotes[0], "8n", now);
-    else if (event.key === "8")
-      synth.triggerAttackRelease(highnotes[1], "8n", now);
-    else if (event.key === "9")
-      synth.triggerAttackRelease(highnotes[2], "8n", now);
-    else if (event.key === "u")
-      synth.triggerAttackRelease(highnotes[3], "8n", now);
-    else if (event.key === "i")
-      synth.triggerAttackRelease(highnotes[4], "8n", now);
-    else if (event.key === "o")
-      synth.triggerAttackRelease(highnotes[5], "8n", now);
-    else if (event.key === "j")
-      synth.triggerAttackRelease(highnotes[6], "8n", now);
-    else if (event.key === "k")
-      synth.triggerAttackRelease(highnotes[7], "8n", now);
-    else if (event.key === "l")
-      synth.triggerAttackRelease(highnotes[8], "8n", now);
-    //^END OF HIGH NOTES
+  //if (event.key == noteKey) {
+  //  bassAndHigh();
+  //}
+  bassAndHigh(event);
 
-    //LOOP
-    if (event.key === noteKey) {
-      for (let i = 0; i < melody.length; i++) {
-        synth.triggerAttackRelease(melody[i], "4n", now + i * 0.5); // plays the melody
-      }
-      for (let i = 0; i < chords.length; i++) {
-        chordsynth.triggerAttackRelease(chords[i], 1.4, now + i * 1.5); // plays the chord
-      }
-    }
+  if (event.key == noteKey) {
+    melodyAndChords();
   }
 }
 
