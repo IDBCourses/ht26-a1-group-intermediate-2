@@ -126,7 +126,7 @@ function keyDown(event) {
       for (let i = 0; i < melody.length; i++) {
         synth.triggerAttackRelease(melody[i], "4n", now + i * 0.5); // plays the melody
       }
-      for (let i = 0; i < chords.length; i++) {
+      for (let i = 0; i < chords.length; i++) {git 
         chordsynth.triggerAttackRelease(chords[i], 1.4, now + i * 1.5); // plays the chord
       }
     }
