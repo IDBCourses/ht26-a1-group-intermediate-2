@@ -32,6 +32,28 @@ let knobSettingsNames = ["reverb", "vibrato", "echo"];
 
 let currentIndex = -1;
 let knobMode;
+// melody for the loop
+let melody = [
+  "C4",
+  "D4",
+  "A4",
+  "C4",
+  "D4",
+  "A4",
+  "C4",
+  "D4",
+  "A4",
+  "C4",
+  "D4",
+  "A4",
+];
+let chords = [
+  ["A3", "C4", "E4"],
+  ["F3", "A3", "C4"],
+  ["C3", "E3", "G3"],
+  ["G3", "B3", "D4"],
+];
+let noteKey = " "; // Key to start the loop;
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
@@ -40,6 +62,7 @@ let knobMode;
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
 const synth = new Tone.PolySynth(Tone.Synth).toDestination(); // can play several notes at once
+const chordsynth = new Tone.PolySynth(Tone.Synth).toDestination();
 
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
@@ -103,8 +126,14 @@ function keyDown(event) {
       synth.triggerAttackRelease(highnotes[8], "8n", now);
     //^END OF HIGH NOTES
 
-    if (event.key === exampleKey) {
-      synth.triggerAttack(exampleNote, Tone.now()); // keeps sounding until triggerRelease
+    //LOOP
+    if (event.key === noteKey) {
+      for (let i = 0; i < melody.length; i++) {
+        synth.triggerAttackRelease(melody[i], "4n", now + i * 0.5); // plays the melody
+      }
+      for (let i = 0; i < chords.length; i++) {
+        chordsynth.triggerAttackRelease(chords[i], 1.4, now + i * 1.5); // plays the chord
+      }
     }
   }
 }
@@ -112,11 +141,11 @@ function keyDown(event) {
 // Runs every time a key comes up.
 function keyUp(event) {
   //console.log("Key up:", event.key);
-
+  //Tone.now();
   // Example: replace this with your own instrument.
-  if (event.key === exampleKey) {
-    synth.triggerRelease(exampleNote, Tone.now());
-  }
+  //if (event.key === exampleKey) {
+  //  synth.triggerRelease(exampleNote, Tone.now());
+  //}
 }
 
 function knobSettings(event) {
