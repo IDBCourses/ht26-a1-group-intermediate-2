@@ -53,7 +53,7 @@ function keyDown(event) {
 
   // Holding a key down sends keydown again and again. Only react to the first one.
   if (event.repeat === false) {
-    console.log("Key down:", event.key);
+    //console.log("Key down:", event.key);
 
     // Example: replace this with your own instrument.
     if (event.key === exampleKey) {
@@ -64,7 +64,7 @@ function keyDown(event) {
 
 // Runs every time a key comes up.
 function keyUp(event) {
-  console.log("Key up:", event.key);
+  //console.log("Key up:", event.key);
 
   // Example: replace this with your own instrument.
   if (event.key === exampleKey) {
@@ -72,6 +72,26 @@ function keyUp(event) {
   }
 }
 
+let knobSettingsNames = ["reverb", "vibrato", "echo"];
+let currentIndex = -1;
+
+function knobSettings(event) {
+  if (event.key === "ArrowRight") {
+    currentIndex = currentIndex + 1;
+    if (currentIndex > knobSettingsNames.length - 1) {
+      currentIndex = 0;
+    }
+    console.log(knobSettingsNames[currentIndex]);
+  }
+
+  if (event.key === "ArrowLeft") {
+    currentIndex = currentIndex - 1;
+    if (currentIndex < 0) {
+      currentIndex = knobSettingsNames.length - 1;
+    }
+    console.log(knobSettingsNames[currentIndex]);
+  }
+}
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
 function setup() {
@@ -81,6 +101,7 @@ function setup() {
   // Put your event listener code here
   window.addEventListener("keydown", keyDown);
   window.addEventListener("keyup", keyUp);
+  window.addEventListener("keydown", knobSettings);
 }
 
 setup(); // Always remember to call setup()!
