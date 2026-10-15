@@ -28,6 +28,10 @@ let bassnotes = ["B3", "C4", "D4", "E5", "F4", "G4", "A4", "B4", "C5"];
 //List of notes for the right side grid of keyboard --> higher octave for higher notes
 let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
 
+let knobSettingsNames = ["reverb", "vibrato", "echo"];
+
+let currentIndex = -1;
+let knobMode;
 // melody for the loop
 let melody = [
   "C4",
@@ -144,9 +148,6 @@ function keyUp(event) {
   //}
 }
 
-let knobSettingsNames = ["reverb", "vibrato", "echo"];
-let currentIndex = -1;
-
 function knobSettings(event) {
   if (event.key === "ArrowRight") {
     currentIndex = currentIndex + 1;
@@ -163,10 +164,20 @@ function knobSettings(event) {
     }
     console.log(knobSettingsNames[currentIndex]);
   }
+  knobMode.textContent = knobSettingsNames[currentIndex];
 }
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
+
 function setup() {
+  //THIS TEXT ELEMENT SHOWS WHAT KNOBMODE YOU ARE CURRENTLY IN
+  //ONLY STARTS SHOWING THE MODE AFTER YOU PRESSED ONE OF THE ARROW KEYS
+  knobMode = document.createElement("p");
+  knobMode.textContent = knobSettingsNames[currentIndex];
+  document.body.appendChild(knobMode);
+  knobMode.style.position = "fixed";
+  knobMode.style.fontWeight = "bold";
+
   update(); // start the update loop
   use(); // start the use loop
 
