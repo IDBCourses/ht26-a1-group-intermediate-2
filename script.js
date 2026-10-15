@@ -23,10 +23,10 @@
 // For example: which key does what, which notes you can play, the tempo.
 
 //List of notes for the left side grid of keyboard --> lower octave for bass
-let bassnotes = ["B2", "C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4"];
+let bassnotes = ["B3", "C4", "D4", "E5", "F4", "G4", "A4", "B4", "C5"];
 
 //List of notes for the right side grid of keyboard --> higher octave for higher notes
-let highnotes = ["B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6"];
+let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
