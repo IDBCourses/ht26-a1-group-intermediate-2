@@ -24,9 +24,16 @@
 const exampleKey = "a"; // the key that plays the example note
 const exampleNote = "C4"; // the note it plays
 
+// Keyboard buttons for the knob
+const knob = ["g", "b", "v"]
+
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: which octave you're playing in, or whether a drone is on.
+
+// Knob settings value
+let knob_floats = [0.0]
+let previous_knob_button = {}
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -54,6 +61,23 @@ function keyDown(event) {
   // Holding a key down sends keydown again and again. Only react to the first one.
   if (event.repeat === false) {
     console.log("Key down:", event.key);
+
+
+    // Checksh if pressed buttons match with the knob arrays buttons
+    for (const [i, letter] of knob.entries()){
+      if (event.key === letter && previous_knob_button != {}){
+      }
+
+        // turn knob up
+        if (i > previous_knob_button.letter){
+
+        // turn knob down
+        } else if (i < previous_knob_button.letter){
+
+        }
+      previous_knob_button.letter = i
+    }
+
 
     // Example: replace this with your own instrument.
     if (event.key === exampleKey) {
