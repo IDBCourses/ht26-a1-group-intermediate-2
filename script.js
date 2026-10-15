@@ -28,7 +28,7 @@ let bassnotes = ["B3", "C4", "D4", "E5", "F4", "G4", "A4", "B4", "C5"];
 //List of notes for the right side grid of keyboard --> higher octave for higher notes
 let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
 
-// Key to start the loop;
+// Key to start the loop
 let noteKey = " ";
 
 // melody for the loop
@@ -36,70 +36,83 @@ let melody = [
   "C4",
   "D4",
   "A4",
-
   "C4",
   "D4",
   "A4",
-
   "C4",
   "D4",
   "A4",
-
-  "C4",
-  "D4",
-  "A4",
-
   "G4",
-  //"C4",
-  "C5",
-  //"G5",
-  "G4",
-
+  "E4",
+  "D4",
   "E4",
   "C4",
   "A3",
-
-  //"D5",
-  "D4",
-  //"B4",
-  "B3",
-  //"G4",
-  "G3",
-
-  "C4",
+  "E4",
+  "G#4",
   "B4",
   "C5",
+  "B4",
+  "A4",
+  "A4",
+  "G4",
+  "E4",
 ];
+
+// Chords to add some spice
 let chords = [
   ["A3", "C4", "E4"],
   ["F3", "A3", "C4"],
-  ["C3", "E3", "G3"],
+  ["D3", "F3", "A3"],
   ["G3", "B3", "D4"],
-
-  ["C3", "E3", "G3"],
   ["A3", "C4", "E4"],
-  ["G3", "B3", "D4"],
-  ["C3", "E3", "G3"],
+  ["E3", "G#3", "B3"],
+  ["A3", "C4", "E4"],
+  ["A3", "C4", "E4"],
 ];
-
-let spacePress = false; // Condition to check if space is pressed;
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: which octave you're playing in, or whether a drone is on.
 
+let spacePress = false; // Condition to check if space is pressed;
+let mute = false; // Mute condtion for "toggle" feature when pressing "Space"
+
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
-const synth = new Tone.PolySynth(Tone.Synth).toDestination(); // can play several notes at once
-const chordsynth = new Tone.PolySynth(Tone.Synth).toDestination();
-synth.volume.value = -5; // adjust synth volume
-chordsynth.volume.value = -10; // adjust chord volume
+const synth = new Tone.PolySynth(Tone.Synth).toDestination(); //Default synth for Bass and High
+
+// Monosynth for Melody
+const melodySynth = new Tone.PolySynth(Tone.MonoSynth, {
+  oscillator: {
+    type: "sawtooth",
+  },
+  envelope: {
+    attack: 0.005,
+    decay: 0.15,
+    sustain: 0.3,
+    release: 0.2,
+  },
+  filterEnvelope: {
+    attack: 0.005,
+    decay: 0.2,
+    sustain: 0.15,
+    release: 0.2,
+    baseFrequency: 200,
+    octaves: 3,
+  },
+}).toDestination();
+
+const chordsynth = new Tone.PolySynth(Tone.Synth).toDestination(); // Polysynth for chords
+
+synth.volume.value = -7; // adjust bass and high volume
+melodySynth.volume.value = -2; // adjust melody volume
+chordsynth.volume.value = -6; // adjust chord volume
 
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
 function update() {
   // Example: replace this with your own instrument.
-
   setTimeout(update, 100); // call update() again in 100 milliseconds
 }
 
@@ -109,26 +122,29 @@ function use() {
   setTimeout(use, 100); // call use() again in 100 milliseconds
 }
 
-//LOOP for melody and chord by user - as7432 -
+//Melody and chord - Author: AS7432 -
 function melodyAndChords() {
   const now = Tone.now();
 
-  // checks if space is pressed, the code below wont run if it space isn't pressed
+  // Checks if space is pressed. The code below will not run if space isn't pressed
   if (spacePress) {
     return;
   }
   spacePress = true;
-
+  // A loop to play the notes through the arrays
   for (let i = 0; i < melody.length; i++) {
-    synth.triggerAttackRelease(melody[i], "16n", now + i * 0.5); // plays the melody, default is "8n" 0.5
+    melodySynth.triggerAttackRelease(melody[i], "8n", now + i * 0.5); // plays the melody
   }
   for (let i = 0; i < chords.length; i++) {
-    chordsynth.triggerAttackRelease(chords[i], 1, now + i * 1.5); // plays the chord, default is 1.2 ,1.5
+    chordsynth.triggerAttackRelease(chords[i], 1, now + i * 1.5); // plays the chord,
   }
-  // timeout space so that it cannot be pressed to avoid overlapping audio.
+  // Timeout space for x seconds so that it cannot be pressed again to avoid overlapping audio
   setTimeout(function () {
     spacePress = false;
-  }, 12500);
+    if (mute == false) {
+      melodyAndChords();
+    }
+  }, 12000); // 12000 because the melody and chords are 12 seconds long
 }
 
 function bassAndHigh(event) {
@@ -176,22 +192,31 @@ function bassAndHigh(event) {
 
 // ---------- Controls (Event Handlers) ----------
 // Runs every time a key goes down.
-async function keyDown(event) {
-  await Tone.start(); // browsers only allow sound after the player has pressed something
 
-  //const now = Tone.now();
-
+// async function because we want the
+function keyDown(event) {
   // Holding a key down sends keydown again and again. Only react to the first one.
-  //if (event.repeat === false) {
+
+  //if (event.repeat === event.key){
   //console.log("Key down:", event.key);
   //}
 
   //if (event.key == noteKey) {
   //  bassAndHigh();
   //}
+
+  //
+  if (event.key == noteKey) {
+    melodySynth.volume.value = -2;
+    chordsynth.volume.value = -6;
+    mute = false;
+  }
+
+  Tone.start(); // Audio starts only when a key is pressed
+
   bassAndHigh(event);
 
-  if (event.key == noteKey) {
+  if (event.key == noteKey && mute == false) {
     melodyAndChords();
   }
 }
@@ -204,6 +229,11 @@ function keyUp(event) {
   //if (event.key === exampleKey) {
   //  synth.triggerRelease(exampleNote, Tone.now());
   //}
+  if (event.key === noteKey) {
+    melodySynth.volume.value = -100; // mutes
+    chordsynth.volume.value = -100;
+    mute = true;
+  }
 }
 
 let knobSettingsNames = ["reverb", "vibrato", "echo"];
