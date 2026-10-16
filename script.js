@@ -76,7 +76,7 @@ let chords = [
 ];
 
 // Keyboard buttons for the knob
-const knob = ["f" ,"v", "c"]
+const knob = ["f", "v", "c"];
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
@@ -85,8 +85,8 @@ const knob = ["f" ,"v", "c"]
 let bPress = false; // Condition to check if "b" is pressed;
 let mute = false; // Mute condtion for "toggle" feature when pressing "b"
 // Knob settings value
-let knob_floats = [0.0]
-let previous_knob_button = ""
+let knob_floats = [0.0];
+let previous_knob_button = "";
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -200,28 +200,34 @@ function bassAndHigh(event) {
   //^END OF HIGH NOTES
 }
 // Knob
-function knob_interact(){
-    // Checksh if pressed buttons match with the knob arrays buttons
-    for (const [i, letter] of knob.entries()){
-      if (event.key === letter){
-        let previous_button_i = knob.indexOf(previous_knob_button)
-        console.clear();
-        console.log(knob_floats[0])
+function knob_interact(event) {
+  // Checksh if pressed buttons match with the knob arrays buttons
+  for (const [i, letter] of knob.entries()) {
+    if (event.key === letter) {
+      let previous_button_i = knob.indexOf(previous_knob_button);
+      console.clear();
+      console.log(knob_floats[0]);
 
-        // turn knob up
-        if ((i > previous_button_i && (i !== knob.length-1 || previous_button_i !== 0)) || (i === 0 && previous_button_i === knob.length-1)){
-          knob_floats[0] += 1
+      // turn knob up
+      if (
+        (i > previous_button_i &&
+          (i !== knob.length - 1 || previous_button_i !== 0)) ||
+        (i === 0 && previous_button_i === knob.length - 1)
+      ) {
+        knob_floats[0] += 1;
 
         // turn knob down
-        } else if ((i < previous_button_i && (i !== 0 || previous_button_i !== knob.length-1)) || (i ===  knob.length-1 && previous_button_i === 0)){
-          knob_floats[0] -= 1
-
-        }
-      previous_knob_button = letter
+      } else if (
+        (i < previous_button_i &&
+          (i !== 0 || previous_button_i !== knob.length - 1)) ||
+        (i === knob.length - 1 && previous_button_i === 0)
+      ) {
+        knob_floats[0] -= 1;
       }
+      previous_knob_button = letter;
     }
   }
-
+}
 
 // ---------- Controls (Event Handlers) ----------
 // Runs every time a key goes down.
@@ -252,6 +258,7 @@ function keyDown(event) {
   if (event.key == noteKey && mute == false) {
     melodyAndChords();
   }
+  knob_interact(event);
 }
 
 // Runs every time a key comes up.
