@@ -55,9 +55,16 @@ let chords = [
 ];
 let noteKey = " "; // Key to start the loop;
 
+// Keyboard buttons for the knob
+const knob = ["f" ,"v", "c"]
+
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: which octave you're playing in, or whether a drone is on.
+
+// Knob settings value
+let knob_floats = [0.0]
+let previous_knob_button = ""
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -78,6 +85,30 @@ function use() {
   setTimeout(use, 100); // call use() again in 100 milliseconds
 }
 
+// Knob
+function knob_interact(){
+    // Checksh if pressed buttons match with the knob arrays buttons
+    for (const [i, letter] of knob.entries()){
+      if (event.key === letter){
+        let previous_button_i = knob.indexOf(previous_knob_button)
+        console.clear();
+        console.log(knob_floats[0])
+
+        // turn knob up
+        if ((i > previous_button_i && (i !== knob.length-1 || previous_button_i !== 0)) || (i === 0 && previous_button_i === knob.length-1)){
+          knob_floats[0] += 1
+
+        // turn knob down
+        } else if ((i < previous_button_i && (i !== 0 || previous_button_i !== knob.length-1)) || (i ===  knob.length-1 && previous_button_i === 0)){
+          knob_floats[0] -= 1
+
+        }
+      previous_knob_button = letter
+      }
+    }
+  }
+
+
 // ---------- Controls (Event Handlers) ----------
 // Runs every time a key goes down.
 function keyDown(event) {
@@ -85,6 +116,11 @@ function keyDown(event) {
   const now = Tone.now();
   // Holding a key down sends keydown again and again. Only react to the first one.
   if (event.repeat === false) {
+    // console.log("Key down:", event.key);
+
+  knob_interact()
+
+
     //console.log("Key down:", event.key);
     //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
     if (event.key === "1") synth.triggerAttackRelease(bassnotes[0], "8n", now);
