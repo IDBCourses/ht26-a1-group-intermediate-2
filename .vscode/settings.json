@@ -12,6 +12,9 @@
     "comments": "off",
     "strings": "off"
   },
+  "[markdown]": {
+    "editor.formatOnSave": false
+  },
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
   "files.trimTrailingWhitespace": true,
