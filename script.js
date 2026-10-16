@@ -31,6 +31,10 @@ let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
 // Key to start the loop
 let noteKey = "b";
 
+let knobSettingsNames = ["reverb", "vibrato", "echo"];
+
+let currentIndex = -1;
+let knobMode;
 // melody for the loop
 let melody = [
   "C4",
@@ -71,12 +75,18 @@ let chords = [
   ["A3", "C4", "E4"],
 ];
 
+// Keyboard buttons for the knob
+const knob = ["f" ,"v", "c"]
+
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: which octave you're playing in, or whether a drone is on.
 
 let bPress = false; // Condition to check if "b" is pressed;
 let mute = false; // Mute condtion for "toggle" feature when pressing "b"
+// Knob settings value
+let knob_floats = [0.0]
+let previous_knob_button = ""
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -189,6 +199,29 @@ function bassAndHigh(event) {
     synth.triggerAttackRelease(highnotes[8], "8n", now);
   //^END OF HIGH NOTES
 }
+// Knob
+function knob_interact(){
+    // Checksh if pressed buttons match with the knob arrays buttons
+    for (const [i, letter] of knob.entries()){
+      if (event.key === letter){
+        let previous_button_i = knob.indexOf(previous_knob_button)
+        console.clear();
+        console.log(knob_floats[0])
+
+        // turn knob up
+        if ((i > previous_button_i && (i !== knob.length-1 || previous_button_i !== 0)) || (i === 0 && previous_button_i === knob.length-1)){
+          knob_floats[0] += 1
+
+        // turn knob down
+        } else if ((i < previous_button_i && (i !== 0 || previous_button_i !== knob.length-1)) || (i ===  knob.length-1 && previous_button_i === 0)){
+          knob_floats[0] -= 1
+
+        }
+      previous_knob_button = letter
+      }
+    }
+  }
+
 
 // ---------- Controls (Event Handlers) ----------
 // Runs every time a key goes down.
@@ -236,9 +269,6 @@ function keyUp(event) {
   }
 }
 
-let knobSettingsNames = ["reverb", "vibrato", "echo"];
-let currentIndex = -1;
-
 function knobSettings(event) {
   if (event.key === "ArrowRight") {
     currentIndex = currentIndex + 1;
@@ -255,10 +285,20 @@ function knobSettings(event) {
     }
     console.log(knobSettingsNames[currentIndex]);
   }
+  knobMode.textContent = knobSettingsNames[currentIndex];
 }
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
+
 function setup() {
+  //THIS TEXT ELEMENT SHOWS WHAT KNOBMODE YOU ARE CURRENTLY IN
+  //ONLY STARTS SHOWING THE MODE AFTER YOU PRESSED ONE OF THE ARROW KEYS
+  knobMode = document.createElement("p");
+  knobMode.textContent = knobSettingsNames[currentIndex];
+  document.body.appendChild(knobMode);
+  knobMode.style.position = "fixed";
+  knobMode.style.fontWeight = "bold";
+
   update(); // start the update loop
   use(); // start the use loop
 
