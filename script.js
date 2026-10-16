@@ -236,14 +236,6 @@ function knob_interact(event) {
 function keyDown(event) {
   // Holding a key down sends keydown again and again. Only react to the first one.
 
-  //if (event.repeat === event.key){
-  //console.log("Key down:", event.key);
-  //}
-
-  //if (event.key == noteKey) {
-  //  bassAndHigh();
-  //}
-
   Tone.start(); // Audio starts only when a key is pressed
 
   //
@@ -263,12 +255,6 @@ function keyDown(event) {
 
 // Runs every time a key comes up.
 function keyUp(event) {
-  //console.log("Key up:", event.key);
-  //Tone.now();
-  // Example: replace this with your own instrument.
-  //if (event.key === exampleKey) {
-  //  synth.triggerRelease(exampleNote, Tone.now());
-  //}
   if (event.key === noteKey) {
     melodySynth.volume.value = -100; // mutes
     chordsynth.volume.value = -100;
