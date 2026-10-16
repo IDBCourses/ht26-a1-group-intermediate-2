@@ -25,7 +25,7 @@ const exampleKey = "a"; // the key that plays the example note
 const exampleNote = "C4"; // the note it plays
 
 // Keyboard buttons for the knob
-const knob = ["g" ,"b", "v"]
+const knob = ["f" ,"v", "c"]
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
