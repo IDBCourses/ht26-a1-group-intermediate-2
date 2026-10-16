@@ -21,8 +21,39 @@
 // ---------- Settings ----------
 // Settings variables should contain all of the "fixed" parts of your programs
 // For example: which key does what, which notes you can play, the tempo.
-const exampleKey = "a"; // the key that plays the example note
-const exampleNote = "C4"; // the note it plays
+
+//List of notes for the left side grid of keyboard --> lower octave for bass
+let bassnotes = ["B3", "C4", "D4", "E5", "F4", "G4", "A4", "B4", "C5"];
+
+//List of notes for the right side grid of keyboard --> higher octave for higher notes
+let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
+
+let knobSettingsNames = ["reverb", "vibrato", "echo"];
+
+let currentIndex = -1;
+let knobMode;
+// melody for the loop
+let melody = [
+  "C4",
+  "D4",
+  "A4",
+  "C4",
+  "D4",
+  "A4",
+  "C4",
+  "D4",
+  "A4",
+  "C4",
+  "D4",
+  "A4",
+];
+let chords = [
+  ["A3", "C4", "E4"],
+  ["F3", "A3", "C4"],
+  ["C3", "E3", "G3"],
+  ["G3", "B3", "D4"],
+];
+let noteKey = " "; // Key to start the loop;
 
 // Keyboard buttons for the knob
 const knob = ["f" ,"v", "c"]
@@ -38,6 +69,7 @@ let previous_knob_button = ""
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
 const synth = new Tone.PolySynth(Tone.Synth).toDestination(); // can play several notes at once
+const chordsynth = new Tone.PolySynth(Tone.Synth).toDestination();
 
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
@@ -81,7 +113,7 @@ function knob_interact(){
 // Runs every time a key goes down.
 function keyDown(event) {
   Tone.start(); // browsers only allow sound after the player has pressed something
-
+  const now = Tone.now();
   // Holding a key down sends keydown again and again. Only react to the first one.
   if (event.repeat === false) {
     // console.log("Key down:", event.key);
@@ -89,33 +121,106 @@ function keyDown(event) {
   knob_interact()
 
 
+    //console.log("Key down:", event.key);
+    //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
+    if (event.key === "1") synth.triggerAttackRelease(bassnotes[0], "8n", now);
+    else if (event.key === "2")
+      synth.triggerAttackRelease(bassnotes[1], "8n", now);
+    else if (event.key === "3")
+      synth.triggerAttackRelease(bassnotes[2], "8n", now);
+    else if (event.key === "q")
+      synth.triggerAttackRelease(bassnotes[3], "8n", now);
+    else if (event.key === "w")
+      synth.triggerAttackRelease(bassnotes[4], "8n", now);
+    else if (event.key === "e")
+      synth.triggerAttackRelease(bassnotes[5], "8n", now);
+    else if (event.key === "a")
+      synth.triggerAttackRelease(bassnotes[6], "8n", now);
+    else if (event.key === "s")
+      synth.triggerAttackRelease(bassnotes[7], "8n", now);
+    else if (event.key === "d")
+      synth.triggerAttackRelease(bassnotes[8], "8n", now);
+    //^END OF BASS NOTES
 
-    // Example: replace this with your own instrument.
-    if (event.key === exampleKey) {
-      synth.triggerAttack(exampleNote, Tone.now()); // keeps sounding until triggerRelease
+    //RIGHT SIDE 3*3 GRID KEYBOARD --> HIGH NOTES
+    if (event.key === "7") synth.triggerAttackRelease(highnotes[0], "8n", now);
+    else if (event.key === "8")
+      synth.triggerAttackRelease(highnotes[1], "8n", now);
+    else if (event.key === "9")
+      synth.triggerAttackRelease(highnotes[2], "8n", now);
+    else if (event.key === "u")
+      synth.triggerAttackRelease(highnotes[3], "8n", now);
+    else if (event.key === "i")
+      synth.triggerAttackRelease(highnotes[4], "8n", now);
+    else if (event.key === "o")
+      synth.triggerAttackRelease(highnotes[5], "8n", now);
+    else if (event.key === "j")
+      synth.triggerAttackRelease(highnotes[6], "8n", now);
+    else if (event.key === "k")
+      synth.triggerAttackRelease(highnotes[7], "8n", now);
+    else if (event.key === "l")
+      synth.triggerAttackRelease(highnotes[8], "8n", now);
+    //^END OF HIGH NOTES
+
+    //LOOP
+    if (event.key === noteKey) {
+      for (let i = 0; i < melody.length; i++) {
+        synth.triggerAttackRelease(melody[i], "4n", now + i * 0.5); // plays the melody
+      }
+      for (let i = 0; i < chords.length; i++) {
+        chordsynth.triggerAttackRelease(chords[i], 1.4, now + i * 1.5); // plays the chord
+      }
     }
   }
 }
 
 // Runs every time a key comes up.
 function keyUp(event) {
-  // console.log("Key up:", event.key);
-
+  //console.log("Key up:", event.key);
+  //Tone.now();
   // Example: replace this with your own instrument.
-  if (event.key === exampleKey) {
-    synth.triggerRelease(exampleNote, Tone.now());
-  }
+  //if (event.key === exampleKey) {
+  //  synth.triggerRelease(exampleNote, Tone.now());
+  //}
 }
 
+function knobSettings(event) {
+  if (event.key === "ArrowRight") {
+    currentIndex = currentIndex + 1;
+    if (currentIndex > knobSettingsNames.length - 1) {
+      currentIndex = 0;
+    }
+    console.log(knobSettingsNames[currentIndex]);
+  }
+
+  if (event.key === "ArrowLeft") {
+    currentIndex = currentIndex - 1;
+    if (currentIndex < 0) {
+      currentIndex = knobSettingsNames.length - 1;
+    }
+    console.log(knobSettingsNames[currentIndex]);
+  }
+  knobMode.textContent = knobSettingsNames[currentIndex];
+}
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
+
 function setup() {
+  //THIS TEXT ELEMENT SHOWS WHAT KNOBMODE YOU ARE CURRENTLY IN
+  //ONLY STARTS SHOWING THE MODE AFTER YOU PRESSED ONE OF THE ARROW KEYS
+  knobMode = document.createElement("p");
+  knobMode.textContent = knobSettingsNames[currentIndex];
+  document.body.appendChild(knobMode);
+  knobMode.style.position = "fixed";
+  knobMode.style.fontWeight = "bold";
+
   update(); // start the update loop
   use(); // start the use loop
 
   // Put your event listener code here
   window.addEventListener("keydown", keyDown);
   window.addEventListener("keyup", keyUp);
+  window.addEventListener("keydown", knobSettings);
 }
 
 setup(); // Always remember to call setup()!
