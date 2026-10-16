@@ -29,7 +29,7 @@ let bassnotes = ["B3", "C4", "D4", "E5", "F4", "G4", "A4", "B4", "C5"];
 let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
 
 // Key to start the loop
-let noteKey = " ";
+let noteKey = "b";
 
 // melody for the loop
 let melody = [
@@ -75,8 +75,8 @@ let chords = [
 // State variables are the parts of your program that change over time.
 // For example: which octave you're playing in, or whether a drone is on.
 
-let spacePress = false; // Condition to check if space is pressed;
-let mute = false; // Mute condtion for "toggle" feature when pressing "Space"
+let bPress = false; // Condition to check if "b" is pressed;
+let mute = false; // Mute condtion for "toggle" feature when pressing "b"
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -126,11 +126,11 @@ function use() {
 function melodyAndChords() {
   const now = Tone.now();
 
-  // Checks if space is pressed. The code below will not run if space isn't pressed
-  if (spacePress) {
+  // Checks if "b" is pressed. The code below will not run if "b" isn't pressed
+  if (bPress) {
     return;
   }
-  spacePress = true;
+  bPress = true;
   // A loop to play the notes through the arrays
   for (let i = 0; i < melody.length; i++) {
     melodySynth.triggerAttackRelease(melody[i], "8n", now + i * 0.5); // plays the melody
@@ -138,9 +138,9 @@ function melodyAndChords() {
   for (let i = 0; i < chords.length; i++) {
     chordsynth.triggerAttackRelease(chords[i], 1, now + i * 1.5); // plays the chord,
   }
-  // Timeout space for x seconds so that it cannot be pressed again to avoid overlapping audio
+  // Timeout "b" for x seconds so that it cannot be pressed again to avoid overlapping audio
   setTimeout(function () {
-    spacePress = false;
+    bPress = false;
     if (mute == false) {
       melodyAndChords();
     }
@@ -205,14 +205,14 @@ function keyDown(event) {
   //  bassAndHigh();
   //}
 
+  Tone.start(); // Audio starts only when a key is pressed
+
   //
   if (event.key == noteKey) {
     melodySynth.volume.value = -2;
     chordsynth.volume.value = -6;
     mute = false;
   }
-
-  Tone.start(); // Audio starts only when a key is pressed
 
   bassAndHigh(event);
 
