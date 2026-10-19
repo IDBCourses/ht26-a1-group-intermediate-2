@@ -12,25 +12,14 @@ to their loop and iterate upon it to create various beats. The concept is simila
 
 
 ## How to play
-| --------------------------------------------------------------------------------|
-| Key                           |  What it does                                   |
-| --------------------------------------------------------------------------------|
-| `B`                           |  Plays the sample loop when held                |
-|---------------------------------------------------------------------------------|
-|`Space`                        |  Plays the loop                                 |
-| --------------------------------------------------------------------------------|
-| `F`, `V`, `C`                 |  Adjusts the knob                               |
-| --------------------------------------------------------------------------------|
-| `1`, `2`, `3`                 |                                                 |
-| `Q`, `W`, `E`                 |  Adjusts the Bass                               |
-| `A`, `S`, `D`                 |                                                 |
-| --------------------------------------------------------------------------------|
-| `7`, `8`, `9`                 |                                                 |
-| `U`, `I`, `O`                 |  Adjusts the High                               |
-| `J`, `K`, `L`                 |                                                 |
-| --------------------------------------------------------------------------------|
-| `Left Arrow`, `Right Arrow`   |  Adjusts the Octave                             |
-| --------------------------------------------------------------------------------|
+| Key | What it does |
+| --- | --- |
+| `B` | Plays the sample loop when held |
+| `Space` | Plays the recorded loop |
+| `F`, `V`, `C` | Adjusts the knob |
+| `1`, `2`, `3`, `Q`, `W`, `E`, `A`, `S`, `D` | Plays bass notes |
+| `7`, `8`, `9`, `U`, `I`, `O`, `J`, `K`, `L` | Plays high notes |
+| `Left Arrow`, `Right Arrow` | Adjusts the effects |
 
 
 - Instructions -

@@ -194,19 +194,19 @@ function bassAndHigh(event) {
   const now = Tone.now();
   //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
   for (let i = 0; i < bassKeys.length; i++) {
-      if (event.key === bassKeys[i]) {
-        synth.triggerAttackRelease(bassnotes[i], now);
-        console.log(bassnotes[i]);
-      }
-    } //^END OF BASS NOTES
+    if (event.key === bassKeys[i]) {
+      synth.triggerAttack(bassnotes[i], now);
+      console.log(bassnotes[i]);
+    }
+  } //^END OF BASS NOTES
 
   //RIGHT SIDE 3*3 GRID KEYBOARD --> HIGH NOTES
   for (let i = 0; i < highKeys.length; i++) {
-      if (event.key === highKeys[i]) {
-        synth.triggerAttackRelease(highnotes[i], now);
-        console.log(highnotes[i]);
-      }
+    if (event.key === highKeys[i]) {
+      synth.triggerAttack(highnotes[i], now);
+      console.log(highnotes[i]);
     }
+  }
   //^END OF HIGH NOTES
 }
 // Knob
@@ -310,9 +310,13 @@ function keyUp(event) {
     chordsynth.volume.value = -100;
     mute = true;
   }
+  for (let i = 0; i < bassKeys.length; i++) {
+    if (event.key === bassKeys[i]) synth.triggerRelease(bassnotes[i]);
+  }
+  for (let i = 0; i < highKeys.length; i++) {
+    if (event.key === highKeys[i]) synth.triggerRelease(highnotes[i]);
+  }
 }
-
-
 
 // LOOP FUNCTION
 let listOfNotes = []; //list of keys pressed during the recording
@@ -333,7 +337,7 @@ function loop(event) {
         if (listOfNotes.length === 1) {
           startDate = new Date();
           startTime = startDate.getTime() / 1000;
-          loopTimes.push(startTime);  //adding the timing to list of loop times
+          loopTimes.push(startTime); //adding the timing to list of loop times
           loopNotes.push(bassnotes[i]); //adding a note to list of loop notes
           console.log(startTime);
         } else if (listOfNotes.length > 1) {
@@ -353,7 +357,7 @@ function loop(event) {
         listOfNotes.push(newLoopNote);
         if (listOfNotes.length === 1) {
           startDate = new Date();
-          startTime = startDate.getTime();
+          startTime = startDate.getTime() / 1000;
           loopTimes.push(startTime);
           loopNotes.push(highnotes[i]);
         } else if (listOfNotes.length > 1) {
@@ -377,7 +381,7 @@ function playLoop(event) {
   if (event.key === loopKey) {
     console.log(event.key);
     for (let i = 0; i < loopNotes.length; i++) {
-      if (loopNotes[i] === loopNotes[0]) {
+      if (i == 0) {
         synth.triggerAttackRelease(loopNotes[i], "8n", now); //loop will start playing right when you press spacebar
       } else {
         synth.triggerAttackRelease(loopNotes[i], "8n", now + loopTimes[i]);
@@ -386,9 +390,6 @@ function playLoop(event) {
     }
   }
 }
-
-
-
 
 function knobSettings(event) {
   if (event.key === "ArrowRight") {
