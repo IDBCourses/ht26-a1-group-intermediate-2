@@ -35,9 +35,15 @@ let highKeys = ["7", "8", "9", "u", "i", "o", "j", "k", "l"];
 // Key to start the loop
 let noteKey = "b";
 
-let knobSettingsNames = ["reverb", "vibrato", "echo"];
+let knobSettingsNames = [
+  "distortion",
+  "reverb - decay",
+  "reverb - wet",
+  "vibrato",
+  "bitcrusher",
+];
 
-let currentIndex = -1;
+let currentIndex = 0;
 let knobMode;
 // melody for the loop
 let melody = [
@@ -89,12 +95,21 @@ const knob = ["f", "v", "c"];
 let bPress = false; // Condition to check if "b" is pressed;
 let mute = false; // Mute condtion for "toggle" feature when pressing "b"
 // Knob settings value
-let knob_floats = [0.0];
+let knob_floats = [0.0, 0.1, 0.0, 0.0, 16.0];
 let previous_knob_button = "";
+let distortion_meter = 0;
+let reverb_decay = 0.1;
+let reverb_wet = 0;
+let vibrato_frequency = 1;
+let bitcrusher_bits = 16;
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
-const synth = new Tone.PolySynth(Tone.Synth).toDestination(); //Default synth for Bass and High
+const crusher = new Tone.BitCrusher().toDestination();
+const vibrato = new Tone.Vibrato().connect(crusher);
+const reverb = new Tone.Reverb().connect(vibrato);
+const dist = new Tone.Distortion(distortion_meter).connect(reverb);
+const synth = new Tone.PolySynth(Tone.Synth).connect(dist); //Default synth for Bass and High
 
 // Monosynth for Melody
 const melodySynth = new Tone.PolySynth(Tone.MonoSynth, {
@@ -115,9 +130,9 @@ const melodySynth = new Tone.PolySynth(Tone.MonoSynth, {
     baseFrequency: 200,
     octaves: 3,
   },
-}).toDestination();
+}).connect(dist);
 
-const chordsynth = new Tone.PolySynth(Tone.Synth).toDestination(); // Polysynth for chords
+const chordsynth = new Tone.PolySynth(Tone.Synth).connect(dist); // Polysynth for chords
 
 synth.volume.value = -7; // adjust bass and high volume
 melodySynth.volume.value = -2; // adjust melody volume
@@ -126,7 +141,21 @@ chordsynth.volume.value = -6; // adjust chord volume
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
 function update() {
-  // Example: replace this with your own instrument.
+  // Extra variable unnecessary but clearer
+  distortion_meter = knob_floats[0];
+  dist.distortion = distortion_meter;
+
+  reverb_decay = knob_floats[1];
+  reverb.decay = reverb_decay;
+
+  reverb_wet = knob_floats[2];
+  reverb.wet.value = reverb_wet;
+
+  vibrato_frequency = knob_floats[3];
+  vibrato.frequency.value = vibrato_frequency;
+
+  bitcrusher_bits = knob_floats[4];
+  crusher.bits.value = bitcrusher_bits;
   setTimeout(update, 100); // call update() again in 100 milliseconds
 }
 
@@ -187,7 +216,9 @@ function knob_interact(event) {
     if (event.key === letter) {
       let previous_button_i = knob.indexOf(previous_knob_button);
       console.clear();
-      console.log(knob_floats[0]);
+      /*console.log(knob_floats[0]);
+      console.log(knob_floats[1]);
+      console.log(knob_floats[2]);*/
 
       // turn knob up
       if (
@@ -195,7 +226,22 @@ function knob_interact(event) {
           (i !== knob.length - 1 || previous_button_i !== 0)) ||
         (i === 0 && previous_button_i === knob.length - 1)
       ) {
-        knob_floats[0] += 1;
+        if (currentIndex == 0 || currentIndex == -1) {
+          //distortion
+          knob_floats[0] += 0.05;
+        } else if (currentIndex == 1) {
+          //reverb decay
+          knob_floats[1] += 0.5;
+        } else if (currentIndex == 2) {
+          //reverb wet (not allowed to go over 1)
+          knob_floats[2] = Math.min(1, knob_floats[2] + 0.1);
+        } else if (currentIndex == 3) {
+          //vibrato
+          knob_floats[3] += 0.5;
+        } else if (currentIndex == 4) {
+          //BitCrusher must be in between 1 and 16
+          knob_floats[4] = Math.min(16, knob_floats[4] + 1);
+        }
 
         // turn knob down
       } else if (
@@ -203,7 +249,22 @@ function knob_interact(event) {
           (i !== 0 || previous_button_i !== knob.length - 1)) ||
         (i === knob.length - 1 && previous_button_i === 0)
       ) {
-        knob_floats[0] -= 1;
+        if (currentIndex == 0) {
+          //distortion (shouldn't get under 0)
+          knob_floats[0] = Math.max(0, knob_floats[0] - 0.05);
+        } else if (currentIndex == 1) {
+          //reverb decay (not allowed to be <=0)
+          knob_floats[1] = Math.max(0.1, knob_floats[1] - 0.5);
+        } else if (currentIndex == 2) {
+          //reverb wet (not allowed to be under 0)
+          knob_floats[2] = Math.max(0, knob_floats[2] - 0.1);
+        } else if (currentIndex == 3) {
+          //vibrato can't be under 0
+          knob_floats[3] = Math.max(0, knob_floats[3] - 0.5);
+        } else if (currentIndex == 4) {
+          //BitCrusher must be in between 1 and 16 Bits
+          knob_floats[4] = Math.max(1, knob_floats[4] - 1);
+        }
       }
       previous_knob_button = letter;
     }
@@ -226,12 +287,20 @@ function keyDown(event) {
     mute = false;
   }
 
-  bassAndHigh(event);
+  if (event.repeat == false) {
+    bassAndHigh(event);
+    knob_interact(event);
+    console.clear();
+    console.log("Distortion Level: " + distortion_meter);
+    console.log("Reverb - Decay Level: " + reverb_decay);
+    console.log("Reverb - Wet Level: " + reverb_wet);
+    console.log("Vibrato Frequence: " + vibrato_frequency);
+    console.log("BitCrusher Bits: " + bitcrusher_bits);
+  }
 
   if (event.key == noteKey && mute == false) {
     melodyAndChords();
   }
-  knob_interact(event);
 }
 
 // Runs every time a key comes up.
