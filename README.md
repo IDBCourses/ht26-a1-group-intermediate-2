@@ -1,13 +1,12 @@
 # Our instrument -LOOPSTATION-
 
-**Play it here:** https://github.com/IDBCourses/ht26-a1-group-intermediate-2
 
 **Group:** Bence, Fabian, Ishkanda, Katarina
 
-The idea of this project is to create a Loopstation where the user plays various notes,
-which is then recorded, saved and then "looped". The user can then add additional notes to the
-loop and iterate upon their loop to create music. The concept is similar to a DJ deck
 
+The idea of this project is to create a "loop station" where the user plays various notes,
+which are then recorded, saved, and then "looped". The user can then add additional notes
+to their loop and iterate upon it to create various beats. The concept is similar to a DJ deck.
 ## How to play
 | Key | What it does |
 | --- | --- |
