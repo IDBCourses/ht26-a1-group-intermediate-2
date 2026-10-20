@@ -23,7 +23,7 @@
 // For example: which key does what, which notes you can play, the tempo.
 
 //List of notes for the left side grid of keyboard --> lower octave for bass
-let bassnotes = ["B3", "C4", "D4", "E5", "F4", "G4", "A4", "B4", "C5"];
+let bassnotes = ["B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"];
 
 let bassKeys = ["1", "2", "3", "q", "w", "e", "a", "s", "d"];
 
@@ -103,8 +103,8 @@ let reverb_wet = 0;
 let vibrato_frequency = 1;
 let bitcrusher_bits = 16;
 // Visual variables
-let load = 0
-let knob_rotation = 1
+let load = 0;
+let knob_rotation = 1;
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -138,19 +138,19 @@ const melodySynth = new Tone.PolySynth(Tone.MonoSynth, {
 const chordsynth = new Tone.PolySynth(Tone.Synth).connect(dist); // Polysynth for chords
 
 // visuals
+const container = document.createElement("div");
+
 const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d")
+const ctx = canvas.getContext("2d");
 
 const Panel = new Image();
 const Knob = new Image();
 
-const panel_size_x = 1920/3
-const panel_size_y = 1080/3
+const panel_size_x = 1920 / 3;
+const panel_size_y = 1080 / 3;
 
-const knob_size_x = 115
-const knob_size_y = 115
-
-
+const knob_size_x = 115;
+const knob_size_y = 115;
 
 synth.volume.value = -7; // adjust bass and high volume
 melodySynth.volume.value = -2; // adjust melody volume
@@ -208,6 +208,8 @@ function melodyAndChords() {
   }, 12000); // 12000 because the melody and chords are 12 seconds long
 }
 
+// fabian.hever@gmail.com
+// assigning key notes to the keyboard
 function bassAndHigh(event) {
   const now = Tone.now();
   //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
@@ -227,6 +229,7 @@ function bassAndHigh(event) {
   }
   //^END OF HIGH NOTES
 }
+
 // Knob
 function knob_interact(event) {
   // Checksh if pressed buttons match with the knob arrays buttons
@@ -244,10 +247,9 @@ function knob_interact(event) {
           (i !== knob.length - 1 || previous_button_i !== 0)) ||
         (i === 0 && previous_button_i === knob.length - 1)
       ) {
+        knob_rotation += 0.5;
+        draw(knob_rotation);
 
-        knob_rotation += 0.5
-        draw(knob_rotation)
-        
         if (currentIndex == 0 || currentIndex == -1) {
           //distortion
           knob_floats[0] += 0.05;
@@ -271,9 +273,8 @@ function knob_interact(event) {
           (i !== 0 || previous_button_i !== knob.length - 1)) ||
         (i === knob.length - 1 && previous_button_i === 0)
       ) {
-
-        knob_rotation -= 0.5
-        draw(knob_rotation)
+        knob_rotation -= 0.5;
+        draw(knob_rotation);
 
         if (currentIndex == 0) {
           //distortion (shouldn't get under 0)
@@ -438,22 +439,32 @@ function knobSettings(event) {
 
 //Draws the two elemtns onto the screen
 function draw(rotation) {
-  ctx.drawImage(Panel, (canvas.width - panel_size_x)/2, (canvas.width - panel_size_y)/2-200, panel_size_x, panel_size_y);
-
+  ctx.drawImage(
+    Panel,
+    (canvas.width - panel_size_x) / 2,
+    (canvas.width - panel_size_y) / 2 - 200,
+    panel_size_x,
+    panel_size_y,
+  );
 
   //centers knobs origin and then draws it with knob_rotation added to the rotation
-  const center_x = (canvas.width - knob_size_x)/2
-  const center_y = (canvas.width - knob_size_y)/2
+  const center_x = (canvas.width - knob_size_x) / 2;
+  const center_y = (canvas.width - knob_size_y) / 2;
 
-  ctx.save()
+  ctx.save();
 
-  ctx.translate(center_x + knob_size_x / 2, center_y + knob_size_y / 2 -133, )
-  ctx.rotate(Math.PI+rotation)
-  ctx.drawImage(Knob, -knob_size_x/2, (-knob_size_y/2), knob_size_x, knob_size_y);
+  ctx.translate(center_x + knob_size_x / 2, center_y + knob_size_y / 2 - 133);
+  ctx.rotate(Math.PI + rotation);
+  ctx.drawImage(
+    Knob,
+    -knob_size_x / 2,
+    -knob_size_y / 2,
+    knob_size_x,
+    knob_size_y,
+  );
 
-  ctx.restore()
+  ctx.restore();
 }
-
 
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
@@ -462,9 +473,33 @@ function setup() {
   //ONLY STARTS SHOWING THE MODE AFTER YOU PRESSED ONE OF THE ARROW KEYS
   knobMode = document.createElement("p");
   knobMode.textContent = knobSettingsNames[currentIndex];
-  document.body.appendChild(knobMode);
-  knobMode.style.position = "fixed";
+
+  //Adding the visual properties
+  knobMode.style.position = "absolute";
+  knobMode.style.width = "200px";
+  knobMode.style.top = "17%";
+  knobMode.style.left = "37.5%";
+  knobMode.style.zIndex = "10"; //Put into foreground
+  knobMode.style.color = "lightgreen";
+  knobMode.style.fontSize = "24px";
+  knobMode.style.textAlign = "center";
   knobMode.style.fontWeight = "bold";
+
+  canvas.style.zIndex = "1"; //canvas in the background
+
+  /*
+  For the text element and the png knob to have a relation to each other
+  so whatever screen size, the text element will always position itself relative to the png knob
+  */
+  container.style.position = "relative";
+  container.style.width = canvas.offsetWidth + "px";
+  container.style.height = canvas.offsetHeight + "px";
+
+  canvas.parentNode.insertBefore(container, canvas);
+
+  container.appendChild(canvas);
+
+  container.appendChild(knobMode);
 
   update(); // start the update loop
   use(); // start the use loop
@@ -478,20 +513,20 @@ function setup() {
 
   // if image is loaded draws it
   Knob.onload = () => {
-  load += 1
-  if (load >= 2){
-  draw(knob_rotation)
-}
-}
+    load += 1;
+    if (load >= 2) {
+      draw(knob_rotation);
+    }
+  };
   Panel.onload = () => {
-  load += 1
-  if (load >= 2){
-  draw(knob_rotation)
-}
-}
+    load += 1;
+    if (load >= 2) {
+      draw(knob_rotation);
+    }
+  };
 
-Panel.src = "Base_Panel.png";
-Knob.src = "Knob.png";
+  Panel.src = "Base_Panel.png";
+  Knob.src = "Knob.png";
 }
 
 setup(); // Always remember to call setup()!
