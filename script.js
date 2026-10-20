@@ -32,9 +32,6 @@ let highnotes = ["D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"];
 
 let highKeys = ["7", "8", "9", "u", "i", "o", "j", "k", "l"];
 
-// Key to start the loop
-let noteKey = "b";
-
 let knobSettingsNames = [
   "distortion",
   "reverb - decay",
@@ -45,6 +42,13 @@ let knobSettingsNames = [
 
 let currentIndex = 0;
 let knobMode;
+
+// Keyboard buttons for the knob
+const knob = ["f", "v", "c"];
+
+// Key to start the loop
+let noteKey = "b";
+
 // melody for the loop
 let melody = [
   "C4",
@@ -85,9 +89,6 @@ let chords = [
   ["A3", "C4", "E4"],
 ];
 
-// Keyboard buttons for the knob
-const knob = ["f", "v", "c"];
-
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: which octave you're playing in, or whether a drone is on.
@@ -105,6 +106,13 @@ let bitcrusher_bits = 16;
 // Visual variables
 let load = 0;
 let knob_rotation = 1;
+
+let listOfNotes = []; //list of keys pressed during the loop recording
+let loopTimes = []; //list of starting times of the key presses
+let loopNotes = [];
+let startTime = null;
+
+let loopKey = " "; //loop playback activated by spacebar
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -199,35 +207,35 @@ function melodyAndChords() {
   for (let i = 0; i < chords.length; i++) {
     chordsynth.triggerAttackRelease(chords[i], 1, now + i * 1.5); // plays the chord,
   }
-  // Timeout "b" for x seconds so that it cannot be pressed again to avoid overlapping audio
+  // Timeout "b" for x seconds so that it cannot be pressed repeatedly to avoid overlapping audio
   setTimeout(function () {
     bPress = false;
     if (mute == false) {
       melodyAndChords();
     }
-  }, 12000); // 12000 because the melody and chords are 12 seconds long
+  }, 12000); // 12000ms because the melody and chords are 12 seconds long
 }
 
 // author: as9717
-// assigning key notes to the keyboard
+// bassAndHigh function - plays the notes connected to the keys on our 2 grids
 function bassAndHigh(event) {
   const now = Tone.now();
-  //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
+
+  //left side 3*3 grid keyboard - bass notes
   for (let i = 0; i < bassKeys.length; i++) {
     if (event.key === bassKeys[i]) {
-      synth.triggerAttack(bassnotes[i], now);
+      synth.triggerAttackRelease(bassnotes[i], "8n", now);
       console.log(bassnotes[i]);
     }
-  } //^END OF BASS NOTES
+  }
 
-  //RIGHT SIDE 3*3 GRID KEYBOARD --> HIGH NOTES
+  //right side 3*3 grid keyboard - high notes
   for (let i = 0; i < highKeys.length; i++) {
     if (event.key === highKeys[i]) {
-      synth.triggerAttack(highnotes[i], now);
+      synth.triggerAttackRelease(highnotes[i], "8n", now);
       console.log(highnotes[i]);
     }
   }
-  //^END OF HIGH NOTES
 }
 
 // Knob
@@ -237,9 +245,6 @@ function knob_interact(event) {
     if (event.key === letter) {
       let previous_button_i = knob.indexOf(previous_knob_button);
       console.clear();
-      /*console.log(knob_floats[0]);
-      console.log(knob_floats[1]);
-      console.log(knob_floats[2]);*/
 
       // turn knob up
       if (
@@ -298,61 +303,8 @@ function knob_interact(event) {
   }
 }
 
-// ---------- Controls (Event Handlers) ----------
-// Runs every time a key goes down.
-
-// async function because we want the
-function keyDown(event) {
-  // Holding a key down sends keydown again and again. Only react to the first one.
-
-  Tone.start(); // Audio starts only when a key is pressed
-
-  //
-  if (event.key == noteKey) {
-    melodySynth.volume.value = -2;
-    chordsynth.volume.value = -6;
-    mute = false;
-  }
-
-  if (event.repeat == false) {
-    bassAndHigh(event);
-    knob_interact(event);
-    console.clear();
-    console.log("Distortion Level: " + distortion_meter);
-    console.log("Reverb - Decay Level: " + reverb_decay);
-    console.log("Reverb - Wet Level: " + reverb_wet);
-    console.log("Vibrato Frequence: " + vibrato_frequency);
-    console.log("BitCrusher Bits: " + bitcrusher_bits);
-  }
-
-  if (event.key == noteKey && mute == false) {
-    melodyAndChords();
-  }
-}
-
-// Runs every time a key comes up.
-function keyUp(event) {
-  if (event.key === noteKey) {
-    melodySynth.volume.value = -100; // mutes
-    chordsynth.volume.value = -100;
-    mute = true;
-  }
-  for (let i = 0; i < bassKeys.length; i++) {
-    if (event.key === bassKeys[i]) synth.triggerRelease(bassnotes[i]);
-  }
-  for (let i = 0; i < highKeys.length; i++) {
-    if (event.key === highKeys[i]) synth.triggerRelease(highnotes[i]);
-  }
-}
-
-// LOOP FUNCTION
-let listOfNotes = []; //list of keys pressed during the recording
-let loopTimes = []; //list of starting times of the key presses //starts counting at first boot
-let loopNotes = [];
-let startTime = null;
-
-//if loopnotes length is only one start the timer
-
+//loop function - records a 5 second melody played by user
+//author: ar5929
 function loop(event) {
   let newLoopNote = "";
   if (event.repeat === false) {
@@ -364,7 +316,7 @@ function loop(event) {
         if (listOfNotes.length === 1) {
           startDate = new Date();
           startTime = startDate.getTime() / 1000;
-          loopTimes.push(startTime); //adding the timing to list of loop times
+          loopTimes.push(0); //adding the timing to list of loop times
           loopNotes.push(bassnotes[i]); //adding a note to list of loop notes
           console.log(startTime);
         } else if (listOfNotes.length > 1) {
@@ -385,7 +337,7 @@ function loop(event) {
         if (listOfNotes.length === 1) {
           startDate = new Date();
           startTime = startDate.getTime() / 1000;
-          loopTimes.push(startTime);
+          loopTimes.push(0);
           loopNotes.push(highnotes[i]);
         } else if (listOfNotes.length > 1) {
           let newTime = new Date();
@@ -401,8 +353,8 @@ function loop(event) {
   }
 }
 
-let loopKey = " ";
-
+//playLoop function - plays back the recorded melody when spacebar is pressed
+//author: ar5929
 function playLoop(event) {
   let now = Tone.now();
   if (event.key === loopKey) {
@@ -418,6 +370,8 @@ function playLoop(event) {
   }
 }
 
+//knobSettings function - cycles between the settings that are changed by the knob with the left and right arrow keys
+//author: ar5929
 function knobSettings(event) {
   if (event.key === "ArrowRight") {
     currentIndex = currentIndex + 1;
@@ -464,6 +418,45 @@ function draw(rotation) {
   );
 
   ctx.restore();
+// ---------- Controls (Event Handlers) ----------
+// Runs every time a key goes down.
+function keyDown(event) {
+  // Holding a key down sends keydown again and again. Only react to the first one.
+
+  // Audio starts only when a key is pressed
+  Tone.start();
+
+  if (event.repeat == false) {
+    bassAndHigh(event);
+    knob_interact(event);
+    console.clear();
+    console.log("Distortion Level: " + distortion_meter);
+    console.log("Reverb - Decay Level: " + reverb_decay);
+    console.log("Reverb - Wet Level: " + reverb_wet);
+    console.log("Vibrato Frequence: " + vibrato_frequency);
+    console.log("BitCrusher Bits: " + bitcrusher_bits);
+  }
+
+  // Resets melody and chords volume
+  if (event.key == noteKey) {
+    melodySynth.volume.value = -2;
+    chordsynth.volume.value = -6;
+    mute = false;
+  }
+
+  if (event.key == noteKey && mute == false) {
+    melodyAndChords();
+  }
+}
+
+// Runs every time a key comes up.
+function keyUp(event) {
+  // Mutes melody and chords
+  if (event.key === noteKey) {
+    melodySynth.volume.value = -100; // mutes
+    chordsynth.volume.value = -100;
+    mute = true;
+  }
 }
 
 // ---------- Setup ----------
