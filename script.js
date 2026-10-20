@@ -103,6 +103,13 @@ let reverb_wet = 0;
 let vibrato_frequency = 1;
 let bitcrusher_bits = 16;
 
+let listOfNotes = []; //list of keys pressed during the loop recording
+let loopTimes = []; //list of starting times of the key presses
+let loopNotes = [];
+let startTime = null;
+
+let loopKey = " "; //loop playback activated by spacebar
+
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
 const crusher = new Tone.BitCrusher().toDestination();
@@ -137,13 +144,6 @@ const chordsynth = new Tone.PolySynth(Tone.Synth).connect(dist); // Polysynth fo
 synth.volume.value = -7; // adjust bass and high volume
 melodySynth.volume.value = -2; // adjust melody volume
 chordsynth.volume.value = -6; // adjust chord volume
-
-let listOfNotes = []; //list of keys pressed during the loop recording
-let loopTimes = []; //list of starting times of the key presses
-let loopNotes = [];
-let startTime = null;
-
-let loopKey = " "; //loop playback activated by spacebar
 
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
