@@ -208,7 +208,7 @@ function melodyAndChords() {
   }, 12000); // 12000 because the melody and chords are 12 seconds long
 }
 
-// fabian.hever@gmail.com
+// author: as9717
 // assigning key notes to the keyboard
 function bassAndHigh(event) {
   const now = Tone.now();
