@@ -138,6 +138,13 @@ synth.volume.value = -7; // adjust bass and high volume
 melodySynth.volume.value = -2; // adjust melody volume
 chordsynth.volume.value = -6; // adjust chord volume
 
+let listOfNotes = []; //list of keys pressed during the loop recording
+let loopTimes = []; //list of starting times of the key presses
+let loopNotes = [];
+let startTime = null;
+
+let loopKey = " "; //loop playback activated by spacebar
+
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
 function update() {
@@ -190,25 +197,27 @@ function melodyAndChords() {
   }, 12000); // 12000 because the melody and chords are 12 seconds long
 }
 
+//bassAndHigh function - plays the notes connected to the keys on our 2 grids
+//author: ar5929
 function bassAndHigh(event) {
   const now = Tone.now();
-  //LEFT SIDE 3*3 GRID KEYBOARD --> BASS NOTES
+  //left side 3*3 grid keyboard - bass notes
   for (let i = 0; i < bassKeys.length; i++) {
     if (event.key === bassKeys[i]) {
-      synth.triggerAttack(bassnotes[i], now);
+      synth.triggerAttackRelease(bassnotes[i], "8n", now);
       console.log(bassnotes[i]);
     }
-  } //^END OF BASS NOTES
+  }
 
-  //RIGHT SIDE 3*3 GRID KEYBOARD --> HIGH NOTES
+  //right side 3*3 grid keyboard - high notes
   for (let i = 0; i < highKeys.length; i++) {
     if (event.key === highKeys[i]) {
-      synth.triggerAttack(highnotes[i], now);
+      synth.triggerAttackRelease(highnotes[i], "8n", now);
       console.log(highnotes[i]);
     }
   }
-  //^END OF HIGH NOTES
 }
+
 // Knob
 function knob_interact(event) {
   // Checksh if pressed buttons match with the knob arrays buttons
@@ -310,22 +319,10 @@ function keyUp(event) {
     chordsynth.volume.value = -100;
     mute = true;
   }
-  for (let i = 0; i < bassKeys.length; i++) {
-    if (event.key === bassKeys[i]) synth.triggerRelease(bassnotes[i]);
-  }
-  for (let i = 0; i < highKeys.length; i++) {
-    if (event.key === highKeys[i]) synth.triggerRelease(highnotes[i]);
-  }
 }
 
-// LOOP FUNCTION
-let listOfNotes = []; //list of keys pressed during the recording
-let loopTimes = []; //list of starting times of the key presses //starts counting at first boot
-let loopNotes = [];
-let startTime = null;
-
-//if loopnotes length is only one start the timer
-
+//loop function - records a 5 second melody played by user
+//author: ar5929
 function loop(event) {
   let newLoopNote = "";
   if (event.repeat === false) {
@@ -337,7 +334,7 @@ function loop(event) {
         if (listOfNotes.length === 1) {
           startDate = new Date();
           startTime = startDate.getTime() / 1000;
-          loopTimes.push(startTime); //adding the timing to list of loop times
+          loopTimes.push(0); //adding the timing to list of loop times
           loopNotes.push(bassnotes[i]); //adding a note to list of loop notes
           console.log(startTime);
         } else if (listOfNotes.length > 1) {
@@ -358,7 +355,7 @@ function loop(event) {
         if (listOfNotes.length === 1) {
           startDate = new Date();
           startTime = startDate.getTime() / 1000;
-          loopTimes.push(startTime);
+          loopTimes.push(0);
           loopNotes.push(highnotes[i]);
         } else if (listOfNotes.length > 1) {
           let newTime = new Date();
@@ -374,8 +371,8 @@ function loop(event) {
   }
 }
 
-let loopKey = " ";
-
+//playLoop function - plays back the recorded melody when spacebar is pressed
+//author: ar5929
 function playLoop(event) {
   let now = Tone.now();
   if (event.key === loopKey) {
@@ -391,6 +388,8 @@ function playLoop(event) {
   }
 }
 
+//knobSettings function - cycles between the settings that are changed by the knob with the left and right arrow keys
+//author: ar5929
 function knobSettings(event) {
   if (event.key === "ArrowRight") {
     currentIndex = currentIndex + 1;
@@ -409,6 +408,7 @@ function knobSettings(event) {
   }
   knobMode.textContent = knobSettingsNames[currentIndex];
 }
+
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
 
