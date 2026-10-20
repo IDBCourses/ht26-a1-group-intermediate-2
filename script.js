@@ -239,6 +239,7 @@ function bassAndHigh(event) {
 }
 
 // Knob
+//author: as7622
 function knob_interact(event) {
   // Checksh if pressed buttons match with the knob arrays buttons
   for (const [i, letter] of knob.entries()) {
@@ -392,6 +393,7 @@ function knobSettings(event) {
 }
 
 //Draws the two elemtns onto the screen
+//author: as7622
 function draw(rotation) {
   ctx.drawImage(
     Panel,
@@ -416,8 +418,9 @@ function draw(rotation) {
     knob_size_x,
     knob_size_y,
   );
-
   ctx.restore();
+}
+
 // ---------- Controls (Event Handlers) ----------
 // Runs every time a key goes down.
 function keyDown(event) {
